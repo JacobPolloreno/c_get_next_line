@@ -6,7 +6,7 @@
 /*   By: jpollore <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/13 14:59:00 by jpollore          #+#    #+#             */
-/*   Updated: 2018/03/15 10:37:08 by jpollore         ###   ########.fr       */
+/*   Updated: 2018/03/16 11:46:27 by jpollore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,24 +33,26 @@ char	*expand_buffer(char *buf, size_t expand_by)
 int		check_prev(char **prev, char **line)
 {
 	char	*nl_ptr;
+	char	*strnew;
 	size_t	prev_size;
 	size_t	trim_cnt;
 
 	if ((nl_ptr = ft_strchr(*prev, '\n')))
 	{
 		trim_cnt = nl_ptr - *prev;
+		strnew = NULL;
 		free(*line);
 		if (!(*line = ft_strsub(*prev, 0, trim_cnt)))
 			return (0);
 		prev_size = ft_strlen(*prev);
-		nl_ptr = *prev;
 		if (prev_size - trim_cnt > 1 &&
-			!(*prev = ft_strsub(*prev, trim_cnt + 1, prev_size - trim_cnt)))
+			!(strnew = ft_strsub(*prev, trim_cnt + 1, prev_size - trim_cnt)))
 		{
 			free(*line);
 			return (0);
 		}
-		free(nl_ptr);
+		free(*prev);
+		*prev = strnew;
 		return (1);
 	}
 	return (0);
