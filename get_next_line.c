@@ -41,6 +41,7 @@ int		check_prev(char **prev, char **line)
 	{
 		trim_cnt = nl_ptr - *prev;
 		strnew = NULL;
+		ft_strdel(line);
 		if (!(*line = ft_strsub(*prev, 0, trim_cnt)))
 			return (0);
 		prev_size = ft_strlen(*prev);
@@ -102,8 +103,7 @@ int		get_next_line(const int fd, char **line)
 	static char	*prev;
 	int			ret;
 
-	ft_strdel(line);
-	if (fd == -1)
+	if (fd < 0 || !line)
 		return (-1);
 	if (prev && check_prev(&prev, line) && line)
 		return (1);
