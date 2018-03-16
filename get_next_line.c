@@ -23,7 +23,7 @@ char	*expand_buffer(char *buf, size_t expand_by)
 	{
 		if (buf)
 		{
-			ft_memcpy((void *)dst, (void *)buf, size);
+			ft_strcpy(dst, buf);
 			ft_strdel(&buf);
 		}
 	}
@@ -33,26 +33,24 @@ char	*expand_buffer(char *buf, size_t expand_by)
 int		check_prev(char **prev, char **line)
 {
 	char	*nl_ptr;
-	char	*strnew;
 	size_t	prev_size;
 	size_t	trim_cnt;
 
 	if ((nl_ptr = ft_strchr(*prev, '\n')))
 	{
 		trim_cnt = nl_ptr - *prev;
-		strnew = NULL;
-		ft_strdel(line);
+		free(*line);
 		if (!(*line = ft_strsub(*prev, 0, trim_cnt)))
 			return (0);
 		prev_size = ft_strlen(*prev);
+		nl_ptr = *prev;
 		if (prev_size - trim_cnt > 1 &&
-			!(strnew = ft_strsub(*prev, trim_cnt + 1, prev_size - trim_cnt)))
+			!(*prev = ft_strsub(*prev, trim_cnt + 1, prev_size - trim_cnt)))
 		{
-			ft_strdel(line);
+			free(*line);
 			return (0);
 		}
-		free(*prev);
-		*prev = strnew;
+		free(nl_ptr);
 		return (1);
 	}
 	return (0);
@@ -80,6 +78,8 @@ int		read_next_line(const int fd, char **line, char **prev)
 		{
 			nl_idx = nl_ptr - buf;
 			prev_size = *prev ? ft_strlen(*prev) : 0;
+			if (prev_size)
+				free(*line);
 			if (!(*line = ft_strnew(prev_size + nl_idx)))
 				return (-1);
 			if (*prev)
@@ -90,7 +90,7 @@ int		read_next_line(const int fd, char **line, char **prev)
 			ft_memccpy((void *)&(*line)[prev_size], (void *)buf, '\n', nl_idx);
 			if (ret - nl_idx > 1)
 				*prev = ft_strsub(buf, nl_idx + 1, ret - nl_idx);
-			ft_bzero(buf, BUFF_SIZE);
+			ft_strdel(&buf);
 			return (ret);
 		}
 	}
