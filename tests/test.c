@@ -138,6 +138,6 @@ int main(void)
 	simple_string();
 	/* test_6(); */
 	/* test_16(); */
-	test_40();
-	test_41();
+	/* test_40(); */
+	/* test_41(); */
 }

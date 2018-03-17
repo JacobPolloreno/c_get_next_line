@@ -60,11 +60,11 @@ int		check_prev(char **prev, char **line)
 
 int		read_next_line(const int fd, char **line, char **prev)
 {
-	int			ret;
-	char		*nl_ptr;
-	char		*buf;
-	size_t		prev_size;
-	size_t		nl_idx;
+	int	ret;
+	char	*nl_ptr;
+	char	*buf;
+	size_t	prev_size;
+	size_t	nl_idx;
 
 	if (!(buf = ft_strnew(BUFF_SIZE)))
 		return (-1);
@@ -100,27 +100,54 @@ int		read_next_line(const int fd, char **line, char **prev)
 	return (ret);
 }
 
+int		fd_insert_cmpf(void *fd1, void *fd2)
+{
+	t_file	*ptr1;
+	t_file	*ptr2;
+
+	ptr1 = (t_file *)fd1;
+	ptr2 = (t_file *)fd2;
+	return (ptr1->fd - ptr2->fd);
+}
+
+int		fd_search_cmpf(void *data_ref, void *node)
+{
+	t_file	*ptr;
+	int	ref;
+
+	ptr = (t_file *)node;
+	ref = *(int *)data_ref;
+	return (ptr->fd - ref);
+}
+
 int		get_next_line(const int fd, char **line)
 {
-	static char	*prev;
-	int			ret;
+	/* static char	*prev; */
+	static	t_btree *root;
+	void		*node;
+	char		*node_buf;
+	int		ret;
+	t_file		search;
 
 	if (fd < 0 || !line)
 		return (-1);
-	if (prev && check_prev(&prev, line) && line)
+	search = (t_file) {node_buf, fd};
+	if (!(node = btree_search_item(root, (void *)&search, &fd_search_cmpf)))
+		btree_insert_data(&root, (void *)&search, &fd_insert_cmpf);
+	if (node && check_prev(&((t_file *)node)->prev, line) && line)
 		return (1);
-	if ((ret = read_next_line(fd, line, &prev)) > 0)
+	if ((ret = read_next_line(fd, line, &((t_file *)node)->prev)) > 0)
 		return (1);
-	if (!prev && !ret)
+	if (!node && !ret)
 		return (0);
-	else if (prev)
+	else if (node)
 	{
-		if (!(*line = ft_strdup(prev)))
+		if (!(*line = ft_strdup(((t_file *)node)->prev)))
 		{
-			ft_strdel(&prev);
+			ft_strdel(&((t_file *)node)->prev);
 			return (-1);
 		}
-		ft_strdel(&prev);
+		ft_strdel(&((t_file *)node)->prev);
 		return (1);
 	}
 	return (-1);
