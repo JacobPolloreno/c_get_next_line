@@ -6,7 +6,7 @@
 /*   By: jpollore <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/13 14:59:00 by jpollore          #+#    #+#             */
-/*   Updated: 2018/03/16 11:46:27 by jpollore         ###   ########.fr       */
+/*   Updated: 2018/03/20 21:39:07 by jpollore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ int		read_next_line(const int fd, char **line, char **prev)
 	{
 		if (!(nl_ptr = ft_strchr(buf, '\n')))
 		{
-			*prev = expand_buffer(*prev, BUFF_SIZE);
+			*prev = expand_buffer(*prev, BUFF_SIZE + 1);
 			ft_strcat(*prev, buf);
 			ft_bzero(buf, BUFF_SIZE);
 		}
@@ -80,8 +80,8 @@ int		read_next_line(const int fd, char **line, char **prev)
 		{
 			nl_idx = nl_ptr - buf;
 			prev_size = *prev ? ft_strlen(*prev) : 0;
-			if (prev_size)
-				free(*line);
+			/* if (prev_size) */
+			/* 	free(*line); */
 			if (!(*line = ft_strnew(prev_size + nl_idx)))
 				return (-1);
 			if (*prev)
@@ -120,27 +120,96 @@ int		fd_search_cmpf(void *data_ref, void *node)
 	return (ptr->fd - ref);
 }
 
+t_file		*create_file(int fd)
+{
+	t_file *node;
+
+	if ((node = (t_file *)ft_memalloc(sizeof(*node))))
+	{
+		node->fd = fd;
+		node->prev = 0;
+	}
+	return (node);
+}
+
+void		delete_file(t_file **file)
+{
+	if (!file)
+		return ;
+	free(*file);
+	*file = NULL;
+}
+
+int		btree_cmpf_file_fd(void *d1, void *d2)
+{
+	int fd1;
+	int fd2;
+
+	fd1 = ((t_file *)d1)->fd;
+	fd2 = ((t_file *)d2)->fd;
+	return (fd1 - fd2);
+}
+
+void		btree_deletef_file(t_btree **node)
+{
+	if (!node)
+		return ;
+	delete_file((*node)->item);
+	free(*node);
+	*node = NULL;
+}
+
+void		*btree_updatef_file(void **data, void *new_data)
+{
+	t_file *new_file;
+	t_file *update_file;
+
+	delete_file((t_file **)data);
+	update_file = (t_file *)(new_data);
+	new_file = create_file(update_file->fd);
+
+	if (update_file->prev)
+		new_file->prev = ft_strdup(update_file->prev);
+	return (new_file);
+}
+
 int		get_next_line(const int fd, char **line)
 {
-	/* static char	*prev; */
-	static	t_btree *root;
-	void		*node;
-	char		*node_buf;
-	int		ret;
-	t_file		search;
+	static t_btree		*root;
+	void			*node;
+	int			ret;
+	t_file			*t_file_ptr;
+	char			eof_chck[2];
 
 	if (fd < 0 || !line)
 		return (-1);
-	search = (t_file) {node_buf, fd};
-	if (!(node = btree_search_item(root, (void *)&search, &fd_search_cmpf)))
-		btree_insert_data(&root, (void *)&search, &fd_insert_cmpf);
-	if (node && check_prev(&((t_file *)node)->prev, line) && line)
+	if (!(node = btree_search_item(root, (void *)&fd, &fd_search_cmpf)))
+	{
+		if (!(t_file_ptr = create_file(fd)))
+			return (-1);
+		btree_insert_node(&root, (void *)t_file_ptr, &fd_insert_cmpf);
+		node = btree_search_item(root, (void *)&fd, &fd_search_cmpf);
+	}
+	if (*line)
+		free(*line);
+	if (((t_file *)node)->prev && check_prev(&((t_file *)node)->prev, line) && line)
 		return (1);
 	if ((ret = read_next_line(fd, line, &((t_file *)node)->prev)) > 0)
+	{
+		if ((ret = read(fd, eof_chck, 1)) != 1)
+		{
+			root = btree_remove_node(&root, (void *)&fd, &fd_search_cmpf,
+				&btree_deletef_file, &btree_updatef_file);
+			return (1);
+		}
+		else
+		{
+			ft_strcat(((t_file *)node)->prev, eof_chck);
+			ft_bzero(eof_chck, 2);
+		}
 		return (1);
-	if (!node && !ret)
-		return (0);
-	else if (node)
+	}
+	if (((t_file *)node)->prev)
 	{
 		if (!(*line = ft_strdup(((t_file *)node)->prev)))
 		{
@@ -148,7 +217,13 @@ int		get_next_line(const int fd, char **line)
 			return (-1);
 		}
 		ft_strdel(&((t_file *)node)->prev);
+		if (!ret)
+			root = btree_remove_node(&root, (void *)&fd, &fd_search_cmpf,
+				&btree_deletef_file, &btree_updatef_file);
 		return (1);
 	}
-	return (-1);
+	if (ret == 0)
+		root = btree_remove_node(&root, (void *)&fd, &fd_search_cmpf,
+			&btree_deletef_file, &btree_updatef_file);
+	return (0);
 }

@@ -52,7 +52,7 @@ void	test_6(void)
 
 void test_16(void)
 {
-	char 	*line;
+	char 		*line;
 	int		out;
 	int		p[2];
 	int		fd;
@@ -71,14 +71,15 @@ void test_16(void)
 
 void	test_40(void)
 {
-	char *line;
-	int fd;
-	int fd2;
-	int fd3;
+	char 	*line;
+	int 	fd;
+	int 	fd2;
+	int 	fd3;
 	int	diff_file_size;
 
     	system("mkdir -p sandbox");
-	system("openssl rand -base64 $((30 * 1000 * 3/4)) | tr -d '\n' | tr -d '\r' > sandbox/one_big_fat_line.txt");
+	/* system("openssl rand -base64 $((30 * 1000 * 3/4)) | tr -d '\n' | tr -d '\r' > sandbox/one_big_fat_line.txt"); */
+	system("openssl rand -base64 $((3 * 10 * 3/4)) | tr -d '\n' | tr -d '\r' > sandbox/one_big_fat_line.txt");
 	system("echo '\n' >> sandbox/one_big_fat_line.txt");
 
 	fd = open("sandbox/one_big_fat_line.txt", O_RDONLY);
@@ -135,9 +136,9 @@ void	test_41(void)
 
 int main(void)
 {
-	simple_string();
+	/* simple_string(); */
 	/* test_6(); */
 	/* test_16(); */
-	/* test_40(); */
+	test_40();
 	/* test_41(); */
 }
