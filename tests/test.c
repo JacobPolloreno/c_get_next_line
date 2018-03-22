@@ -6,10 +6,10 @@
 
 void	simple_string(void)
 {
-	char	*line;
+	char		*line;
 	int		out;
 	int		p[2];
-	char	*str;
+	char		*str;
 	int		gnl_ret;
 
 	str = (char *)malloc(1000 * 1000);
@@ -29,6 +29,8 @@ void	simple_string(void)
 		printf("fail\n");
 	if (!(gnl_ret == 0 || gnl_ret == 1))
 		printf("fail\n");
+	free(str);
+	free(line);
 }
 
 void	test_6(void)
@@ -48,6 +50,7 @@ void	test_6(void)
 	dup2(out, fd);
 	get_next_line(p[0], &line);
 	assert(strcmp(line, "oiuytrew") == 0);
+	free(line);
 }
 
 void test_16(void)
@@ -67,6 +70,7 @@ void test_16(void)
 	dup2(out, fd);
 	get_next_line(p[0], &line);
 	assert(strcmp(line, "efghijkl") == 0);
+	free(line);
 }
 
 void	test_40(void)
@@ -101,6 +105,7 @@ void	test_40(void)
 	close(fd3);
 
 	assert(diff_file_size == 0);
+	free(line);
 }
 
 void	test_41(void)
@@ -132,6 +137,7 @@ void	test_41(void)
 	close(fd3);
 
 	assert(diff_file_size == 0);
+	free(line);
 }
 
 void	test_nlnl(void)
@@ -153,6 +159,7 @@ void	test_nlnl(void)
 	assert(strcmp(line, "") == 0);
 	get_next_line(p[0], &line);
 	assert(strcmp(line, "") == 0);
+	free(line);
 }
 
 void	simple_string_13(void)
@@ -178,6 +185,7 @@ void	simple_string_13(void)
 	assert(strcmp(line, "efgh") == 0);
 	ret = get_next_line(p[0], &line);
 	assert(ret == 0);
+	free(line);
 }
 
 void	test_30(void)
@@ -249,6 +257,10 @@ void	test_30(void)
 
 	get_next_line(p_fd3[0], &line_fd3);
 	assert(strcmp(line_fd3, "999") == 0);
+	free(line_fd0);
+	free(line_fd1);
+	free(line_fd2);
+	free(line_fd3);
 }
 
 void	test_simple(void)
@@ -274,6 +286,7 @@ void	test_simple(void)
 	assert(strcmp(line, "ccc") == 0);
 	get_next_line(p[0], &line);
 	assert(strcmp(line, "ddd") == 0);
+	free(line);
 }
 
 void	test_42(void)
@@ -284,6 +297,7 @@ void	test_42(void)
 	int 	fd3;
 	int	diff_file_size;
 
+	line = NULL;
 	system("mkdir -p sandbox");
 	system("openssl rand -base64 $((30 * 1000 * 3/4)) | tr -d '\n' | tr -d '\r' > sandbox/one_big_fat_line.txt");
 	system("echo '\n' >> sandbox/one_big_fat_line.txt");
@@ -307,6 +321,7 @@ void	test_42(void)
 	close(fd3);
 
 	assert(diff_file_size == 0);
+	free(line);
 }
 
 int main(void)

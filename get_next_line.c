@@ -188,13 +188,18 @@ int		get_next_line(const int fd, char **line)
 			return (-1);
 		btree_insert_node(&root, (void *)t_file_ptr, &fd_insert_cmpf);
 		node = btree_search_item(root, (void *)&fd, &fd_search_cmpf);
+		/* *line = NULL; */
 	}
 	if (((t_file *)node)->prev &&
 		check_prev(&((t_file *)node)->prev, line) && line)
 	{
 		if (!((t_file *)node)->prev && (ret = read(fd, eof_chck, 1)) != 1)
+		{
 			root = btree_remove_node(&root, (void *)&fd, &fd_search_cmpf,
 				&btree_deletef_file, &btree_updatef_file);
+			free(node);
+			node = NULL;
+		}
 		else if (!((t_file *)node)->prev && ret)
 		{
 			ft_strcat(((t_file *)node)->prev, eof_chck);
@@ -205,8 +210,12 @@ int		get_next_line(const int fd, char **line)
 	if ((ret = read_next_line(fd, line, &((t_file *)node)->prev)) > 0)
 	{
 		if (!((t_file *)node)->prev && (ret = read(fd, eof_chck, 1)) != 1)
-			root = btree_remove_node(&root, (void *)&fd, &fd_search_cmpf,
-				&btree_deletef_file, &btree_updatef_file);
+			{
+				root = btree_remove_node(&root, (void *)&fd, &fd_search_cmpf,
+					&btree_deletef_file, &btree_updatef_file);
+				free(node);
+				node = NULL;
+			}
 		else if (!((t_file *)node)->prev && ret)
 		{
 			ft_strcat(((t_file *)node)->prev, eof_chck);
@@ -223,12 +232,22 @@ int		get_next_line(const int fd, char **line)
 		}
 		ft_strdel(&((t_file *)node)->prev);
 		if (!ret)
+		{
 			root = btree_remove_node(&root, (void *)&fd, &fd_search_cmpf,
 				&btree_deletef_file, &btree_updatef_file);
-		return (1);
+			/* ft_strdel(line); */
+		}
+		free(node);
+		node = NULL;
+		return (!ret ? 0 : 1);
 	}
-	if (ret == 0)
+	if (!ret)
+	{
 		root = btree_remove_node(&root, (void *)&fd, &fd_search_cmpf,
 			&btree_deletef_file, &btree_updatef_file);
+		free(node);
+		node = NULL;
+	}
+	/* ft_strdel(line); */
 	return (!ret ? 0 : -1);
 }
