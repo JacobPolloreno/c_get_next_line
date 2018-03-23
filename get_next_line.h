@@ -14,10 +14,5 @@
 #define GET_NEXT_LINE_H
 # define BUFF_SIZE 10024
 
-typedef struct s_file	t_file;
-struct s_file {
-	char		*prev;
-	int		fd;
-};
 int			get_next_line(const int fd, char **line);
 #endif

@@ -1,8 +1,10 @@
-#include "libft.h"
-#include "get_next_line.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 #include <fcntl.h>
+#include <unistd.h>
+#include "get_next_line.h"
 
 void	simple_string(void)
 {
