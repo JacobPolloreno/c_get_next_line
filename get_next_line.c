@@ -98,7 +98,7 @@ static	int	chk_eof_before_return(t_btree **root, const int *fd, t_file **node)
 	}
 	else if (!(*node)->content && ret)
 	{
-		ft_strcat((*node)->content, eof_chck);
+		(*node)->content = ft_strdup(eof_chck);
 		ft_bzero(eof_chck, 2);
 	}
 	return (1);
@@ -109,24 +109,26 @@ int			get_next_line(const int fd, char **line)
 	static t_btree	*root;
 	t_file			*node;
 	int				ret;
-	t_file			*t_file_ptr;
 
 	if (fd < 0 || !line || read(fd, NULL, 0) == -1)
 		return (-1);
 	while (!(node = btree_search_item(root, (void *)&fd, &fdsearchcmp)))
 	{
-		if (!(t_file_ptr = create_file(fd)))
+		if (!(node = create_file(fd)))
 			return (-1);
-		btree_insert_node(&root, (void *)t_file_ptr, &fd_cmp);
+		btree_insert_node(&root, (void *)node, &fd_cmp);
 	}
 	if (node->content && chk_prv(&(node->content), line) && line)
 		return (chk_eof_before_return(&root, &fd, &node));
 	if ((ret = read_next_line(fd, line, &(node->content)) > 0))
 		return (chk_eof_before_return(&root, &fd, &node));
 	if (node->content && (*line = ft_strdup(node->content)))
+	{
 		ft_strdel(&(node->content));
-	if (!ret)
-		root = btree_remove_node(&root, (void *)&fd, &fdsearchcmp,
-			&btree_deletefd, &btree_updatefd);
+		return (1);
+	}
+	root = btree_remove_node(&root, (void *)&fd, &fdsearchcmp,
+		&btree_deletefd, &btree_updatefd);
+	free(node);
 	return (!ret ? 0 : -1);
 }
