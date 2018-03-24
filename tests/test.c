@@ -83,9 +83,9 @@ void	test_40(void)
 	int 	fd3;
 	int	diff_file_size;
 
+	line =NULL;
     	system("mkdir -p sandbox");
-	/* system("openssl rand -base64 $((30 * 1000 * 3/4)) | tr -d '\n' | tr -d '\r' > sandbox/one_big_fat_line.txt"); */
-	system("openssl rand -base64 $((3 * 10 * 3/4)) | tr -d '\n' | tr -d '\r' > sandbox/one_big_fat_line.txt");
+	system("openssl rand -base64 $((30 * 1000 * 3/4)) | tr -d '\n' | tr -d '\r' > sandbox/one_big_fat_line.txt");
 	system("echo '\n' >> sandbox/one_big_fat_line.txt");
 
 	fd = open("sandbox/one_big_fat_line.txt", O_RDONLY);
@@ -118,6 +118,7 @@ void	test_41(void)
 	int fd3;
 	int diff_file_size;
 
+	line = NULL;
 	system("mkdir -p sandbox");
 	system("openssl rand -out sandbox/large_file.txt -base64 $((50 * 1000 * 3/4)) 2> /dev/null");
 
