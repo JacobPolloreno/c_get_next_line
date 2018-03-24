@@ -6,7 +6,7 @@
 /*   By: jpollore <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/13 14:59:00 by jpollore          #+#    #+#             */
-/*   Updated: 2018/03/23 15:30:16 by jpollore         ###   ########.fr       */
+/*   Updated: 2018/03/23 17:59:24 by jpollore         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,8 +91,7 @@ static	int	chk_eof_before_return(t_btree **root, const int *fd, t_file **node)
 
 	if (!(*node)->content && (ret = read(*fd, eof_chck, 1)) != 1)
 	{
-		(*root) = btree_remove_node(root, (void *)fd, &fdsearchcmp,
-			&btree_deletefd, &btree_updatefd);
+		(*root) = btree_remove_fdnode(root, (void *)fd);
 		free(*node);
 		*node = NULL;
 	}
@@ -127,8 +126,7 @@ int			get_next_line(const int fd, char **line)
 		ft_strdel(&(node->content));
 		return (1);
 	}
-	root = btree_remove_node(&root, (void *)&fd, &fdsearchcmp,
-		&btree_deletefd, &btree_updatefd);
+	root = btree_remove_fdnode(&root, (void *)&fd);
 	free(node);
 	return (!ret ? 0 : -1);
 }
