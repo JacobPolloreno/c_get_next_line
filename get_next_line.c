@@ -55,8 +55,7 @@ static	int	found_line(char **prv, char **line, char **buf, int ret)
 		return (0);
 	}
 	nl_idx = nl_ptr - *buf;
-	if ((prv_size = *prv ? ft_strlen(*prv) : 0))
-		free(*line);
+	prv_size = *prv ? ft_strlen(*prv) : 0;
 	if (!(*line = ft_strnew(prv_size + nl_idx)))
 		return (-1);
 	if (*prv && ft_strncpy(*line, *prv, prv_size))
@@ -119,14 +118,13 @@ int			get_next_line(const int fd, char **line)
 	}
 	if (node->content && chk_prv(&(node->content), line) && line)
 		return (chk_eof_before_return(&root, &fd, &node));
-	if ((ret = read_next_line(fd, line, &(node->content)) > 0))
+	else if ((ret = read_next_line(fd, line, &(node->content)) > 0))
 		return (chk_eof_before_return(&root, &fd, &node));
-	if (node->content && (*line = ft_strdup(node->content)))
+	else if (node->content && (*line = ft_strdup(node->content)))
 	{
 		ft_strdel(&(node->content));
-		return (1);
+		return (chk_eof_before_return(&root, &fd, &node));
 	}
-	root = btree_remove_fdnode(&root, (void *)&fd);
-	free(node);
-	return (!ret ? 0 : -1);
+	ft_strdel(line);
+	return (0);
 }
