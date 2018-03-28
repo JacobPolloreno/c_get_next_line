@@ -24,7 +24,7 @@ static	int	chk_prv(char **prv, char **line)
 	{
 		trim_cnt = nl_ptr - *prv;
 		strnew = NULL;
-		free(*line);
+		/* free(*line); */
 		if (!(*line = ft_strsub(*prv, 0, trim_cnt)))
 			return (0);
 		prv_size = ft_strlen(*prv);
@@ -112,9 +112,9 @@ int			get_next_line(const int fd, char **line)
 		return (-1);
 	while (!(node = btree_search_item(root, (void *)&fd, &fdsearchcmp)))
 	{
-		if (!(node = create_file(fd)))
+		if (!(node = create_file(fd)) ||
+			btree_insert_node(&root, (void *)node, &fd_cmp))
 			return (-1);
-		btree_insert_node(&root, (void *)node, &fd_cmp);
 	}
 	if (node->content && chk_prv(&(node->content), line) && line)
 		return (chk_eof_before_return(&root, &fd, &node));

@@ -12,18 +12,18 @@
 
 #include "libft.h"
 
-void	btree_insert_node(t_btree **root, void *item,
+int	btree_insert_node(t_btree **root, void *item,
 			int (*cmpf)(void *, void*))
 {
 	if (!root || !item || !cmpf)
-		return ;
+		return (-1);
 	if (*root == NULL)
-		(*root) = btree_create_node(item);
-	else
 	{
-		if ((*cmpf)(item, (*root)->item) < 0)
-			btree_insert_node(&(*root)->left, item, cmpf);
-		else
-			btree_insert_node(&(*root)->right, item, cmpf);
+		if (((*root) = btree_create_node(item)))
+			return (0);
+		return (-1);
 	}
+	if ((*cmpf)(item, (*root)->item) < 0)
+		return (btree_insert_node(&(*root)->left, item, cmpf));
+	return (btree_insert_node(&(*root)->right, item, cmpf));
 }

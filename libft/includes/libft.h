@@ -90,8 +90,6 @@ void		btree_apply_infix(t_btree *root, void (*applyf)(void *));
 void		btree_apply_suffix(t_btree *root, void (*applyf)(void *));
 void		*btree_search_item(t_btree *root, void *data_ref,
 				int (*cmpf)(void *, void *));
-void		btree_insert_node(t_btree **root, void *item,
-				int (*cmpf)(void *, void*));
 void		btree_update_node(t_btree **node, void *new_data,
 				void *(*updatef)(void **, void *));
 void		btree_deletefd(t_btree **node);
@@ -135,6 +133,8 @@ int			ft_issort(int *tab, int length, int (*f)(int, int));
 int			btree_level_count(t_btree *root);
 int			fd_cmp(void *fd1, void *fd2);
 int			fdsearchcmp(void *data_ref, void *node);
+int			btree_insert_node(t_btree **root, void *item,
+				int (*cmpf)(void *, void*));
 t_list		*ft_lstmap(t_list *lst, t_list *(*f)(t_list *elem));
 t_list		*ft_lstnew(const void *content, size_t content_size);
 t_btree		*btree_create_node(void *item);
