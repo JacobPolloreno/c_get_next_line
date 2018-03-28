@@ -24,7 +24,6 @@ static	int	chk_prv(char **prv, char **line)
 	{
 		trim_cnt = nl_ptr - *prv;
 		strnew = NULL;
-		/* free(*line); */
 		if (!(*line = ft_strsub(*prv, 0, trim_cnt)))
 			return (0);
 		prv_size = ft_strlen(*prv);
@@ -96,6 +95,7 @@ static	int	chk_eof_before_return(t_btree **root, const int *fd, t_file **node)
 	}
 	else if (!(*node)->content && ret)
 	{
+		eof_chck[1] = '\0';
 		(*node)->content = ft_strdup(eof_chck);
 		ft_bzero(eof_chck, 2);
 	}
@@ -125,6 +125,5 @@ int			get_next_line(const int fd, char **line)
 		ft_strdel(&(node->content));
 		return (chk_eof_before_return(&root, &fd, &node));
 	}
-	ft_strdel(line);
 	return (0);
 }
